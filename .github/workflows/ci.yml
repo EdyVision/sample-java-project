@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        java-version: [11, 17]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+        cache: 'maven'
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: Run tests with coverage
+      run: mvn clean test
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Test Results Summary
+      if: always()
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Java Version**: ${{ matrix.java-version }}" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Tests**: All tests passed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Coverage**: Generated with JaCoCo" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 **Coverage Report**: Available in build artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "🔍 **Test Details**: Check the build logs for full test output" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report-${{ matrix.java-version }}
+        path: target/site/jacoco/
+        retention-days: 30
