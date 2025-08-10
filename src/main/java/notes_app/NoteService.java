@@ -1,7 +1,11 @@
 package notes_app;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing notes with basic CRUD operations.
@@ -91,7 +95,7 @@ public class NoteService {
         String searchTitle = title.toLowerCase().trim();
         return notes.values().stream()
                 .filter(note -> note.getTitle().toLowerCase().contains(searchTitle))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**

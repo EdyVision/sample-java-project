@@ -13,6 +13,8 @@ jobs:
     strategy:
       matrix:
         java-version: [11, 17]
+        # Note: Java 11 is the minimum supported version
+        # Java 17 is tested for future compatibility
     
     steps:
     - name: Checkout code

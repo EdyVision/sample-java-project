@@ -49,8 +49,10 @@ target/site/jacoco/       # Generated coverage reports
 ## Building and Running
 
 ### Prerequisites
-- Java 11 or higher
+- Java 11 or higher (minimum supported version)
 - Maven 3.6 or higher
+
+**Note**: This project is tested on Java 11 and 17. The `toList()` method (Java 16+) has been replaced with `collect(Collectors.toList())` for Java 11 compatibility.
 
 ### Continuous Integration
 This project includes GitHub Actions workflows that automatically run tests on every push and pull request:
